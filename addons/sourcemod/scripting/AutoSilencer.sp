@@ -19,168 +19,117 @@
 #include <sdktools>
 #include <sdkhooks>
 #include <clientprefs>
-#include <multicolors>
 
-#pragma semicolon 1
-#pragma newdecls required
+new Handle:cookie = INVALID_HANDLE;
+new bool:option_cookie[MAXPLAYERS + 1] = {true,...};
 
-bool primary[2048];
-bool g_bIsAutoSEnabled[MAXPLAYERS + 1] = {false, ...};
-Handle g_hCookie = INVALID_HANDLE;
+new bool:primera[2048] = false;
 
-public Plugin myinfo =
+public Plugin:myinfo =
 {
 	name = "SM Autosilencer",
-	author = "Franc1sco franug, Dolly, .Rushaway",
-	description = "AutoSilence m4a1 and usp",
-	version = "1.3.1",
-	url = "https://github.com/srcdslab/sm-plugin-autosilencer"
+	author = "Franc1sco franug",
+	description = "oh yeah",
+	version = "1.1",
+	url = "http://steamcommunity.com/id/franug"
 };
 
-public void OnPluginStart()
+public OnPluginStart()
 {
-	/* TRANSLATIONS */
-	LoadTranslations("autosilencer.phrases.txt");
-	LoadTranslations("common.phrases.txt"); // Yes - No
-	LoadTranslations("clientprefs.phrases.txt"); // Clients Settings
-
-	/* PUBLIC COMMANDS */
-	RegConsoleCmd("sm_autosilencer", Command_AutoSilencer);
-
-	/* COOKIES */
-	g_hCookie = RegClientCookie("Autosilencer On/Off", "", CookieAccess_Public);
-	SetCookieMenuItem(AutoSilencerCookieHandler, 0, "AutoSilencer Settings");
-	
-	/* LATE LOAD */
-	for (int i = 1; i <= MaxClients; i++)
+	for(new i = 1; i < MaxClients; i++)
 	{
-		if (IsClientInGame(i))
+		if(IsClientInGame(i))
 		{
 			OnClientPutInServer(i);
-			if (AreClientCookiesCached(i))
-				OnClientCookiesCached(i);
 		}
 	}
+	
+	cookie = RegClientCookie("Autosilencer On/Off", "", CookieAccess_Private);
+	new info;
+	SetCookieMenuItem(CookieMenuHandler, any:info, "Autosilencer");
+	CreateConVar("sm_autosilencer_version", "1.1", "ok", FCVAR_PLUGIN|FCVAR_SPONLY|FCVAR_REPLICATED|FCVAR_NOTIFY|FCVAR_CHEAT|FCVAR_DONTRECORD);
+	
 }
 
-public void OnEntityCreated(int entity, const char[] classname)
-{    
-	if (StrContains(classname, "weapon_") == 0) 
+public OnEntityCreated(entity, const String:classname[])
+{
+	
+	if(StrContains(classname, "weapon_") == 0) 
 	{
-		primary[entity] = false;
+		primera[entity] = false;
 	}
 }
 
-public void OnClientPutInServer(int client)
+public OnClientPutInServer(client)
 {
-	if (IsFakeClient(client) || IsClientSourceTV(client))
-		return;
-
-	SDKHook(client, SDKHook_WeaponEquip, Hook_OnWeaponEquip);
+    SDKHook(client, SDKHook_WeaponEquip, Hook_OnWeaponEquip);
 }
 
-public void OnClientCookiesCached(int client)
+public Action:Hook_OnWeaponEquip(client, weapon)
 {
-	if (IsFakeClient(client) || IsClientSourceTV(client))
-		return;
+	if(primera[weapon]) return;
+	else primera[weapon] = true;
+	
+	if(!option_cookie[client]) return;
+	
+	decl String:item[20]; item[0] = '\0';
+	GetEdictClassname(weapon, item, sizeof(item));
 
-	char sValue[6];
-	GetClientCookie(client, g_hCookie, sValue, sizeof(sValue));
-	g_bIsAutoSEnabled[client] = (sValue[0] != '\0') ? view_as<bool>(StringToInt(sValue)) : false;
-}
-
-public Action Hook_OnWeaponEquip(int client, int weapon)
-{
-	if (!g_bIsAutoSEnabled[client])
-		return Plugin_Continue;
-
-	if (primary[weapon])
-		return Plugin_Continue;
-	else
-		primary[weapon] = true;
-
-	char sClassName[20];
-
-	sClassName[0] = '\0';
-	GetEdictClassname(weapon, sClassName, sizeof(sClassName));
-
-	if (strcmp(sClassName, "weapon_m4a1", false) == 0 || strcmp(sClassName, "weapon_usp", false) == 0)
-	{
+	if ((StrEqual(item, "weapon_m4a1") || StrEqual(item, "weapon_usp"))){
 		SetEntProp(weapon, Prop_Send, "m_bSilencerOn", 1);
 		SetEntProp(weapon, Prop_Send, "m_weaponMode", 1);
 	}
-
-	return Plugin_Continue;
 }
 
-public Action Command_AutoSilencer(int client, int args)
+
+// Pref
+
+public CookieMenuHandler(client, CookieMenuAction:action, any:info, String:buffer[], maxlen)
 {
-	if (!client)
+	if (action == CookieMenuAction_DisplayOption)
 	{
-		CReplyToCommand(client, "[SM] This command can only be used in-game!");
-		return Plugin_Handled;
-	}
-
-	UpdateSilencerStatus(client);
-	return Plugin_Handled;
-}
-
-public void AutoSilencerCookieHandler(int client, CookieMenuAction action, any info, char[] buffer, int maxlen)
-{
-	switch (action)
-	{
-		case CookieMenuAction_SelectOption:
-			AutoSilencerSetting(client);
-	}
-}
-
-public void AutoSilencerSetting(int client)
-{
-	Menu menu = new Menu(AutoSilencerSettingHandler, MENU_ACTIONS_ALL);
-	menu.SetTitle("[AutoSilencer] %T", "Client Settings", client);
-
-	char status[64], sEnabled[32], sDisabled[32];
-	FormatEx(sEnabled, sizeof(sEnabled), "%T", "On", client);
-	FormatEx(sDisabled, sizeof(sDisabled), "%T", "Off", client);
-	FormatEx(status, 64, "%T: %s", "Toggle AutoSilencer", client, g_bIsAutoSEnabled[client] ? sEnabled : sDisabled);
-	menu.AddItem("status", status);
-
-	menu.ExitBackButton = true;
-	menu.ExitButton = true;
-	menu.Display(client, MENU_TIME_FOREVER);
-}
-
-public int AutoSilencerSettingHandler(Menu menu, MenuAction action, int param1, int param2)
-{
-	switch (action)
-	{
-		case MenuAction_Select:
+		decl String:status[10];
+		if (option_cookie[client])
 		{
-			char info[64];
-			menu.GetItem(param2, info, sizeof(info));
-			if (strcmp(info, "status", false) == 0)
-				UpdateSilencerStatus(param1);
-
-			AutoSilencerSetting(param1);
+			Format(status, sizeof(status), "Enabled");
 		}
-		case MenuAction_Cancel:
-			ShowCookieMenu(param1);
-		case MenuAction_End: 
-			delete menu;
+		else
+		{
+			Format(status, sizeof(status), "Disabled");
+		}
+		
+		Format(buffer, maxlen, "Autosilencer: %s", status);
 	}
-	return 0;
+	// CookieMenuAction_SelectOption
+	else
+	{
+		option_cookie[client] = !option_cookie[client];
+		
+		if (option_cookie[client])
+		{
+			SetClientCookie(client, cookie, "On");
+			PrintToChat(client, "\x04Autosilencer enabled");
+		}
+		else
+		{
+			SetClientCookie(client, cookie, "Off");
+			PrintToChat(client, "\x04Autosilencer disabled");
+
+		}
+		
+		ShowCookieMenu(client);
+	}
 }
 
-stock void UpdateSilencerStatus(int client)
+public OnClientCookiesCached(client)
 {
-	char sEnabled[32], sDisabled[32];
-	FormatEx(sEnabled, sizeof(sEnabled), "{green}%T", "On", client);
-	FormatEx(sDisabled, sizeof(sDisabled), "{red}%T", "Off", client);
+	option_cookie[client] = GetCookie(client);
+}
 
-	g_bIsAutoSEnabled[client] = !g_bIsAutoSEnabled[client];
-	CReplyToCommand(client, "{green}[SM]{default} %T %s", "Auto Silencer Status Reply", client, g_bIsAutoSEnabled[client] ? sEnabled : sDisabled, client);
-
-	char sValue[6];
-	FormatEx(sValue, sizeof(sValue), "%i", g_bIsAutoSEnabled[client]);
-	SetClientCookie(client, g_hCookie, sValue);
+bool:GetCookie(client)
+{
+	decl String:buffer[10];
+	GetClientCookie(client, cookie, buffer, sizeof(buffer));
+	
+	return !StrEqual(buffer, "Off");
 }
