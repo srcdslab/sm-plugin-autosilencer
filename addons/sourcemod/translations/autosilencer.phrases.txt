@@ -1,0 +1,13 @@
+"Phrases"
+{
+	"Toggle AutoSilencer"
+	{
+		"en"		"Toggle AutoSilencer"
+	}
+
+	"Auto Silencer Status Reply"
+	{
+		"#format"	"{1:s}"
+		"en"		"Auto Silencer for M4A1 and USP has been turned {1}{default}."
+	}
+}
