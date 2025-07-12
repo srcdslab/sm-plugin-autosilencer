@@ -24,6 +24,7 @@
 #pragma semicolon 1
 #pragma newdecls required
 
+bool g_bLate = false;
 bool primary[2048];
 bool g_bIsAutoSEnabled[MAXPLAYERS + 1] = {false, ...};
 Handle g_hCookie = INVALID_HANDLE;
@@ -36,6 +37,12 @@ public Plugin myinfo =
 	version = "1.3.1",
 	url = "https://github.com/srcdslab/sm-plugin-autosilencer"
 };
+
+public APLRes AskPluginLoad2(Handle myself, bool late, char[] error, int err_max)
+{
+	g_bLate = late;
+	return APLRes_Success;
+}
 
 public void OnPluginStart()
 {
@@ -50,8 +57,11 @@ public void OnPluginStart()
 	/* COOKIES */
 	g_hCookie = RegClientCookie("Autosilencer On/Off", "", CookieAccess_Public);
 	SetCookieMenuItem(AutoSilencerCookieHandler, 0, "AutoSilencer Settings");
-	
+
 	/* LATE LOAD */
+	if (!g_bLate)
+		return;
+
 	for (int i = 1; i <= MaxClients; i++)
 	{
 		if (IsClientInGame(i))
@@ -61,6 +71,7 @@ public void OnPluginStart()
 				OnClientCookiesCached(i);
 		}
 	}
+	g_bLate = false;
 }
 
 public void OnEntityCreated(int entity, const char[] classname)
