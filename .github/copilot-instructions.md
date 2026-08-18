@@ -8,8 +8,8 @@ This repository contains the **AutoSilencer** SourcePawn plugin for SourceMod, w
 ### Core Technologies
 - **Language**: SourcePawn (.sp files)
 - **Platform**: SourceMod 1.11+ (minimum supported version)
-- **Build System**: SourceKnight (modern SourceMod build tool)
-- **Compiler**: SourcePawn compiler via SourceKnight
+- **Build System**: Native GitHub Actions (spcomp)
+- **Compiler**: SourcePawn compiler (spcomp), SourceMod 1.12.x
 - **Dependencies**: 
   - sourcemod (core framework)
   - multicolors (chat coloring library)
@@ -88,28 +88,23 @@ public void OnPluginEnd() {
 
 ## Build System
 
-### SourceKnight Configuration
-The project uses SourceKnight (`sourceknight.yaml`) for building:
-- **Build Command**: Handled by GitHub Actions
-- **Dependencies**: Auto-managed (SourceMod, MultiColors)
-- **Output**: Compiled `.smx` files in plugins directory
+### GitHub Actions Configuration
+The project builds via `.github/workflows/ci.yml` using native GitHub Actions:
+- **Compiler Setup**: `rumblefrog/setup-sp` (SourceMod 1.12.x)
+- **Dependencies**: Cloned directly (SourceMod compiler, MultiColors includes)
+- **Output**: Compiled `.smx` files in `addons/sourcemod/plugins/`
 
 ### Local Development
 ```bash
-# Install SourceKnight (if working locally)
-pip install sourceknight
-
-# Build plugin
-sourceknight build
-
-# The compiled plugin will be in .sourceknight/package/
+# Compile locally with spcomp (from addons/sourcemod/scripting)
+spcomp -i include -o ../plugins/AutoSilencer.smx AutoSilencer.sp
 ```
 
 ### CI/CD Pipeline
 - **Trigger**: Push/PR to any branch
-- **Build**: Ubuntu 24.04 with SourceKnight
+- **Build**: Ubuntu latest, spcomp via rumblefrog/setup-sp
 - **Artifacts**: Packaged plugin with translations
-- **Release**: Auto-created for tags and main branch
+- **Release**: Auto-created for tags and main branch (tagged `latest`)
 
 ## Translation System
 
