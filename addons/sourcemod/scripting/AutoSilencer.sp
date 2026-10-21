@@ -27,14 +27,14 @@
 bool g_bLate = false;
 bool primary[2048];
 bool g_bIsAutoSEnabled[MAXPLAYERS + 1] = {false, ...};
-Handle g_hCookie = INVALID_HANDLE;
+Cookie g_hCookie = null;
 
 public Plugin myinfo =
 {
 	name = "SM Autosilencer",
 	author = "Franc1sco franug, Dolly, .Rushaway",
 	description = "AutoSilence m4a1 and usp",
-	version = "1.3.1",
+	version = "1.3.2",
 	url = "https://github.com/srcdslab/sm-plugin-autosilencer"
 };
 
@@ -55,7 +55,7 @@ public void OnPluginStart()
 	RegConsoleCmd("sm_autosilencer", Command_AutoSilencer);
 
 	/* COOKIES */
-	g_hCookie = RegClientCookie("Autosilencer On/Off", "", CookieAccess_Public);
+	g_hCookie = new Cookie("Autosilencer On/Off", "", CookieAccess_Public);
 	SetCookieMenuItem(AutoSilencerCookieHandler, 0, "AutoSilencer Settings");
 
 	/* LATE LOAD */
@@ -96,7 +96,7 @@ public void OnClientCookiesCached(int client)
 		return;
 
 	char sValue[6];
-	GetClientCookie(client, g_hCookie, sValue, sizeof(sValue));
+	g_hCookie.Get(client, sValue, sizeof(sValue));
 	g_bIsAutoSEnabled[client] = (sValue[0] != '\0') ? view_as<bool>(StringToInt(sValue)) : false;
 }
 
@@ -193,5 +193,5 @@ stock void UpdateSilencerStatus(int client)
 
 	char sValue[6];
 	FormatEx(sValue, sizeof(sValue), "%i", g_bIsAutoSEnabled[client]);
-	SetClientCookie(client, g_hCookie, sValue);
+	g_hCookie.Set(client, sValue);
 }
