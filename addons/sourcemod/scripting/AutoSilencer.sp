@@ -34,7 +34,7 @@ public Plugin myinfo =
 	name = "SM Autosilencer",
 	author = "Franc1sco franug, Dolly, .Rushaway",
 	description = "AutoSilence m4a1 and usp",
-	version = "1.3.2",
+	version = "1.3.3",
 	url = "https://github.com/srcdslab/sm-plugin-autosilencer"
 };
 
@@ -189,7 +189,7 @@ stock void UpdateSilencerStatus(int client)
 	FormatEx(sDisabled, sizeof(sDisabled), "{red}%T", "Off", client);
 
 	g_bIsAutoSEnabled[client] = !g_bIsAutoSEnabled[client];
-	CReplyToCommand(client, "{green}[SM]{default} %T %s", "Auto Silencer Status Reply", client, g_bIsAutoSEnabled[client] ? sEnabled : sDisabled, client);
+	CReplyToCommand(client, "{green}[SM]{default} %T", "Auto Silencer Status Reply", client, g_bIsAutoSEnabled[client] ? sEnabled : sDisabled);
 
 	char sValue[6];
 	FormatEx(sValue, sizeof(sValue), "%i", g_bIsAutoSEnabled[client]);

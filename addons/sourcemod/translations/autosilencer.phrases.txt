@@ -3,11 +3,23 @@
 	"Toggle AutoSilencer"
 	{
 		"en"		"Toggle AutoSilencer"
+		"fr"		"Activer/désactiver le silencieux auto"
+		"ru"		"Переключить автоглушитель"
+		"es"		"Alternar silenciador automático"
+		"de"		"Automatischen Schalldämpfer umschalten"
+		"pt"		"Alternar silenciador automático"
+		"chi"		"切换自动消音器"
 	}
 
 	"Auto Silencer Status Reply"
 	{
 		"#format"	"{1:s}"
 		"en"		"Auto Silencer for M4A1 and USP has been turned {1}{default}."
+		"fr"		"Silencieux automatique pour M4A1 et USP : {1}{default}."
+		"ru"		"Автоглушитель для M4A1 и USP: {1}{default}."
+		"es"		"Silenciador automático para M4A1 y USP: {1}{default}."
+		"de"		"Automatischer Schalldämpfer für M4A1 und USP: {1}{default}."
+		"pt"		"Silenciador automático para M4A1 e USP: {1}{default}."
+		"chi"		"M4A1 和 USP 自动消音器：{1}{default}。"
 	}
 }
