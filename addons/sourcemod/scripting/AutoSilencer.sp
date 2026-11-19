@@ -34,7 +34,7 @@ public Plugin myinfo =
 	name = "SM Autosilencer",
 	author = "Franc1sco franug, Dolly, .Rushaway",
 	description = "AutoSilence m4a1 and usp",
-	version = "1.3.4",
+	version = "1.3.5",
 	url = "https://github.com/srcdslab/sm-plugin-autosilencer"
 };
 
