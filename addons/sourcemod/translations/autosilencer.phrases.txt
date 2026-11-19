@@ -9,6 +9,12 @@
 		"de"		"Automatischen Schalldämpfer umschalten"
 		"pt"		"Alternar silenciador automático"
 		"chi"		"切换自动消音器"
+		"pl"		"Przełącz automatyczny tłumik"
+		"tr"		"Otomatik susturucuyu aç/kapat"
+		"it"		"Attiva/disattiva silenziatore automatico"
+		"ua"		"Перемкнути автоматичний глушник"
+		"zho"		"切換自動消音器"
+		"cze"		"Přepnout automatický tlumič"
 	}
 
 	"Auto Silencer Status Reply"
@@ -21,5 +27,11 @@
 		"de"		"Automatischer Schalldämpfer für M4A1 und USP: {1}{default}."
 		"pt"		"Silenciador automático para M4A1 e USP: {1}{default}."
 		"chi"		"M4A1 和 USP 自动消音器：{1}{default}。"
+		"pl"		"Automatyczny tłumik do M4A1 i USP: {1}{default}."
+		"tr"		"M4A1 ve USP için otomatik susturucu: {1}{default}."
+		"it"		"Silenziatore automatico per M4A1 e USP: {1}{default}."
+		"ua"		"Автоматичний глушник для M4A1 і USP: {1}{default}."
+		"zho"		"M4A1 和 USP 自動消音器：{1}{default}。"
+		"cze"		"Automatický tlumič pro M4A1 a USP: {1}{default}."
 	}
 }
